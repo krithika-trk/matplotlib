@@ -29,6 +29,7 @@ from matplotlib import _api, mlab
 from matplotlib.axes import Axes
 from matplotlib.backend_bases import MouseButton
 from matplotlib.figure import Figure
+from security import safe_command
 
 
 # we need to define a custom str because py310 change
@@ -400,8 +401,7 @@ def build_pyplot(pyplot_path):
         pyplot.writelines(boilerplate_gen())
 
     # Run black to autoformat pyplot
-    subprocess.run(
-        [sys.executable, "-m", "black", "--line-length=88", pyplot_path],
+    safe_command.run(subprocess.run, [sys.executable, "-m", "black", "--line-length=88", pyplot_path],
         check=True
     )
 
