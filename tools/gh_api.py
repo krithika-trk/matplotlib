@@ -7,6 +7,7 @@ import re
 import sys
 
 import requests
+from security import safe_requests
 
 try:
     import requests_cache
@@ -104,7 +105,7 @@ def get_pull_request(project, num, auth=False):
     else:
         header = None
     print("fetching %s" % url, file=sys.stderr)
-    response = requests.get(url, headers=header)
+    response = safe_requests.get(url, headers=header)
     response.raise_for_status()
     return json.loads(response.text, object_hook=Obj)
 
@@ -130,7 +131,7 @@ def get_paged_request(url, headers=None, **params):
             print(f"fetching {url}", file=sys.stderr)
         else:
             print(f"fetching {url} with {params}", file=sys.stderr)
-        response = requests.get(url, headers=headers, params=params)
+        response = safe_requests.get(url, headers=headers, params=params)
         response.raise_for_status()
         results.extend(response.json())
         if 'next' in response.links:
@@ -185,7 +186,7 @@ def is_pull_request(issue):
 def get_authors(pr):
     print("getting authors for #%i" % pr['number'], file=sys.stderr)
     h = make_auth_header()
-    r = requests.get(pr['commits_url'], headers=h)
+    r = safe_requests.get(pr['commits_url'], headers=h)
     r.raise_for_status()
     commits = r.json()
     authors = []
