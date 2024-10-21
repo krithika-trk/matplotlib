@@ -11,6 +11,7 @@ import sys
 from tempfile import TemporaryDirectory
 import time
 import tokenize
+from security import safe_command
 
 
 _preamble = """\
@@ -82,7 +83,7 @@ def main():
                 if backend is not None:
                     env["MPLBACKEND"] = backend
                 start = time.perf_counter()
-                proc = subprocess.run([sys.executable, relpath.name],
+                proc = safe_command.run(subprocess.run, [sys.executable, relpath.name],
                                       cwd=cwd, env=env)
                 elapsed = round(1000 * (time.perf_counter() - start))
                 runinfos.append(RunInfo(backend, elapsed, proc.returncode))
