@@ -14,7 +14,6 @@ to scalars.
 
    This example requires :download:`basic_units.py <basic_units.py>`
 """
-import random
 
 from basic_units import cm, inch
 
@@ -25,6 +24,7 @@ import matplotlib.collections as collections
 import matplotlib.lines as lines
 import matplotlib.patches as patches
 import matplotlib.text as text
+import secrets
 
 fig, ax = plt.subplots()
 ax.xaxis.set_units(cm)
@@ -39,7 +39,7 @@ if 0:
     verts = []
     for i in range(10):
         # a random line segment in inches
-        verts.append(zip(*inch*10*np.random.rand(2, random.randint(2, 15))))
+        verts.append(zip(*inch*10*np.random.rand(2, secrets.SystemRandom().randint(2, 15))))
     lc = collections.LineCollection(verts, axes=ax)
     ax.add_collection(lc)
 
