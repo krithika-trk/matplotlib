@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import matplotlib.transforms as mtransforms
 import matplotlib.figure as mfigure
 from mpl_toolkits.axes_grid1 import axes_divider, parasite_axes  # type: ignore
+import fickling
 
 
 def test_simple():
@@ -123,7 +124,7 @@ def _pickle_load_subprocess():
     path = os.environ['PICKLE_FILE_PATH']
 
     with open(path, 'rb') as blob:
-        fig = pickle.load(blob)
+        fig = fickling.load(blob)
 
     print(str(pickle.dumps(fig)))
 
@@ -268,7 +269,7 @@ def test_unpickle_canvas():
     out = BytesIO()
     pickle.dump(fig, out)
     out.seek(0)
-    fig2 = pickle.load(out)
+    fig2 = fickling.load(out)
     assert fig2.canvas is not None
 
 
