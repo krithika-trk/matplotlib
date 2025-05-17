@@ -16,6 +16,7 @@ from matplotlib.testing.decorators import check_figures_equal, image_comparison
 from matplotlib.testing._markers import needs_usetex
 from matplotlib import font_manager as fm
 from matplotlib.offsetbox import (OffsetImage, AnnotationBbox)
+import defusedxml.ElementTree
 
 
 def test_visibility():
@@ -212,7 +213,7 @@ def test_unicode_won():
         fig.savefig(fd, format='svg')
         buf = fd.getvalue()
 
-    tree = xml.etree.ElementTree.fromstring(buf)
+    tree = defusedxml.ElementTree.fromstring(buf)
     ns = 'http://www.w3.org/2000/svg'
     won_id = 'SFSS3583-8e'
     assert len(tree.findall(f'.//{{{ns}}}path[@d][@id="{won_id}"]')) == 1
@@ -405,7 +406,7 @@ def test_svg_clear_default_metadata(monkeypatch):
             fig.savefig(fd, format='svg', metadata={name.title(): None})
             buf = fd.getvalue().decode()
 
-        root = xml.etree.ElementTree.fromstring(buf)
+        root = defusedxml.ElementTree.fromstring(buf)
         work, = root.findall(f'./{SVGNS}metadata/{RDFNS}RDF/{CCNS}Work')
         for key in metadata_contains:
             data = work.findall(f'./{DCNS}{key}')
@@ -431,7 +432,7 @@ def test_svg_clear_all_metadata():
 
     SVGNS = '{http://www.w3.org/2000/svg}'
 
-    root = xml.etree.ElementTree.fromstring(buf)
+    root = defusedxml.ElementTree.fromstring(buf)
     assert not root.findall(f'./{SVGNS}metadata')
 
 
@@ -457,7 +458,7 @@ def test_svg_metadata():
     CCNS = '{http://creativecommons.org/ns#}'
     DCNS = '{http://purl.org/dc/elements/1.1/}'
 
-    root = xml.etree.ElementTree.fromstring(buf)
+    root = defusedxml.ElementTree.fromstring(buf)
     rdf, = root.findall(f'./{SVGNS}metadata/{RDFNS}RDF')
 
     # Check things that are single entries.
@@ -598,7 +599,7 @@ def test_svg_font_string(font_str, include_generic):
         fig.savefig(fd, format="svg")
         buf = fd.getvalue()
 
-    tree = xml.etree.ElementTree.fromstring(buf)
+    tree = defusedxml.ElementTree.fromstring(buf)
     ns = "http://www.w3.org/2000/svg"
     text_count = 0
     for text_element in tree.findall(f".//{{{ns}}}text"):

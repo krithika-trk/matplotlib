@@ -22,6 +22,7 @@ from matplotlib.transforms import Bbox, Affine2D, TransformedBbox
 import matplotlib.ticker as mticker
 
 import pytest
+import defusedxml.ElementTree
 
 
 @image_comparison(['image_interps'], style='mpl20')
@@ -767,13 +768,6 @@ def test_setdata_xya(image_cls, x, y, a):
 
 
 def test_minimized_rasterized():
-    # This ensures that the rasterized content in the colorbars is
-    # only as thick as the colorbar, and doesn't extend to other parts
-    # of the image.  See #5814.  While the original bug exists only
-    # in Postscript, the best way to detect it is to generate SVG
-    # and then parse the output to make sure the two colorbar images
-    # are the same size.
-    from xml.etree import ElementTree
 
     np.random.seed(0)
     data = np.random.rand(10, 10)
@@ -789,7 +783,7 @@ def test_minimized_rasterized():
     plt.savefig(buff, format='svg')
 
     buff = io.BytesIO(buff.getvalue())
-    tree = ElementTree.parse(buff)
+    tree = defusedxml.ElementTree.parse(buff)
     width = None
     for image in tree.iter('image'):
         if width is None:

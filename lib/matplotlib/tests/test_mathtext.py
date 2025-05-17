@@ -5,7 +5,6 @@ from pathlib import Path
 import platform
 import re
 import shlex
-from xml.etree import ElementTree as ET
 from typing import Any
 
 import numpy as np
@@ -18,6 +17,7 @@ import matplotlib as mpl
 from matplotlib.testing.decorators import check_figures_equal, image_comparison
 import matplotlib.pyplot as plt
 from matplotlib import mathtext, _mathtext
+import defusedxml.ElementTree
 
 pyparsing_version = parse_version(pyparsing.__version__)
 
@@ -450,7 +450,7 @@ def test_mathtext_fallback(fallback, fontlist):
     fig, ax = plt.subplots()
     fig.text(.5, .5, test_str, fontsize=40, ha='center')
     fig.savefig(buff, format="svg")
-    tspans = (ET.fromstring(buff.getvalue())
+    tspans = (defusedxml.ElementTree.fromstring(buff.getvalue())
               .findall(".//{http://www.w3.org/2000/svg}tspan[@style]"))
     # Getting the last element of the style attrib is a close enough
     # approximation for parsing the font property.
