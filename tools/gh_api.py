@@ -64,7 +64,7 @@ def get_auth_token():
       "note_url": "https://github.com/ipython/ipython/tree/master/tools",
     }
     response = requests.post('https://api.github.com/authorizations',
-                            auth=(user, pw), data=json.dumps(auth_request))
+                            auth=(user, pw), data=json.dumps(auth_request), timeout=60)
     response.raise_for_status()
     token = json.loads(response.text)['token']
     keyring.set_password('github', fake_username, token)
@@ -76,7 +76,7 @@ def make_auth_header():
 def post_issue_comment(project, num, body):
     url = f'https://api.github.com/repos/{project}/issues/{num}/comments'
     payload = json.dumps({'body': body})
-    requests.post(url, data=payload, headers=make_auth_header())
+    requests.post(url, data=payload, headers=make_auth_header(), timeout=60)
 
 def post_gist(content, description='', filename='file', auth=False):
     """Post some text to a Gist, and return the URL."""
@@ -91,7 +91,7 @@ def post_gist(content, description='', filename='file', auth=False):
     }).encode('utf-8')
 
     headers = make_auth_header() if auth else {}
-    response = requests.post("https://api.github.com/gists", data=post_data, headers=headers)
+    response = requests.post("https://api.github.com/gists", data=post_data, headers=headers, timeout=60)
     response.raise_for_status()
     response_data = json.loads(response.text)
     return response_data['html_url']
@@ -104,7 +104,7 @@ def get_pull_request(project, num, auth=False):
     else:
         header = None
     print("fetching %s" % url, file=sys.stderr)
-    response = requests.get(url, headers=header)
+    response = requests.get(url, headers=header, timeout=60)
     response.raise_for_status()
     return json.loads(response.text, object_hook=Obj)
 
@@ -130,7 +130,7 @@ def get_paged_request(url, headers=None, **params):
             print(f"fetching {url}", file=sys.stderr)
         else:
             print(f"fetching {url} with {params}", file=sys.stderr)
-        response = requests.get(url, headers=headers, params=params)
+        response = requests.get(url, headers=headers, params=params, timeout=60)
         response.raise_for_status()
         results.extend(response.json())
         if 'next' in response.links:
@@ -185,7 +185,7 @@ def is_pull_request(issue):
 def get_authors(pr):
     print("getting authors for #%i" % pr['number'], file=sys.stderr)
     h = make_auth_header()
-    r = requests.get(pr['commits_url'], headers=h)
+    r = requests.get(pr['commits_url'], headers=h, timeout=60)
     r.raise_for_status()
     commits = r.json()
     authors = []
@@ -272,7 +272,7 @@ def post_download(project, filename, name=None, description=""):
 
     payload = json.dumps(dict(name=name, size=len(filedata),
                     description=description))
-    response = requests.post(url, data=payload, headers=make_auth_header())
+    response = requests.post(url, data=payload, headers=make_auth_header(), timeout=60)
     response.raise_for_status()
     reply = json.loads(response.content)
     s3_url = reply['s3_url']
@@ -289,5 +289,5 @@ def post_download(project, filename, name=None, description=""):
     )
     fields['Content-Type'] = reply['mime_type']
     data, content_type = encode_multipart_formdata(fields)
-    s3r = requests.post(s3_url, data=data, headers={'Content-Type': content_type})
+    s3r = requests.post(s3_url, data=data, headers={'Content-Type': content_type}, timeout=60)
     return s3r
