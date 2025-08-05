@@ -20,6 +20,7 @@ import matplotlib as mpl
 from matplotlib import _c_internal_utils
 from matplotlib.backend_tools import ToolToggleBase
 from matplotlib.testing import subprocess_run_helper as _run_helper
+from security import safe_command
 
 
 class _WaitForStringPopen(subprocess.Popen):
@@ -481,8 +482,7 @@ def test_cross_Qt_imports(host, mpl):
 @pytest.mark.skipif(sys.platform == "win32", reason="Cannot send SIGINT on Windows.")
 def test_webagg():
     pytest.importorskip("tornado")
-    proc = subprocess.Popen(
-        [sys.executable, "-c",
+    proc = safe_command.run(subprocess.Popen, [sys.executable, "-c",
          inspect.getsource(_test_interactive_impl)
          + "\n_test_interactive_impl()", "{}"],
         env={**os.environ, "MPLBACKEND": "webagg", "SOURCE_DATE_EPOCH": "0"})

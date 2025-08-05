@@ -24,6 +24,7 @@ from matplotlib.backends.backend_pdf import (
 from matplotlib.path import Path
 from matplotlib.figure import Figure
 from matplotlib._pylab_helpers import Gcf
+from security import safe_command
 
 _log = logging.getLogger(__name__)
 
@@ -260,8 +261,7 @@ class LatexManager:
         # must first `kill()` it, and then `communicate()` with or `wait()` on
         # it.
         try:
-            self.latex = subprocess.Popen(
-                [mpl.rcParams["pgf.texsystem"], "-halt-on-error"],
+            self.latex = safe_command.run(subprocess.Popen, [mpl.rcParams["pgf.texsystem"], "-halt-on-error"],
                 stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                 encoding="utf-8", cwd=self.tmpdir)
         except FileNotFoundError as err:
